@@ -4,6 +4,9 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+if not os.environ.get("GDRIVE_CREDENTIALS"):
+    raise ValueError("Missing GDRIVE_CREDENTIALS environment variable. Pastikan sudah di-set di GitHub Secrets dan dikaitkan di workflow.")
+
 # 1. Load credential service account
 creds = json.loads(os.environ["GDRIVE_CREDENTIALS"])
 credentials = Credentials.from_service_account_info(
