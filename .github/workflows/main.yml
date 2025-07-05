@@ -39,7 +39,7 @@ jobs:
       # Run as a mlflow project
       - name: Run mlflow project
         run: |
-          mlflow run .
+          mlflow run MLproject
  
       # Save models to GitHub Repository
       - name: Save mlruns to repo
