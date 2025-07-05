@@ -57,7 +57,7 @@ jobs:
         run: python MLproject/upload_to_gdrive.py
 
       - name: Build Docker Model
-        run: mlflow build-docker -n ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest
+        run: mlflow models build-docker -n ${{ secrets.DOCKERHUB_USERNAME }}/ml-model:latest
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
