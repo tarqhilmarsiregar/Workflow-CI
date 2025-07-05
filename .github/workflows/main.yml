@@ -1,7 +1,7 @@
 name: health-and-sleep-relation-CI
 
 on:
-  push:
+  push: 
     branches:
       - main
   pull_request:
@@ -9,7 +9,7 @@ on:
       - main
 
 env:
-  CSV_URL: "MLproject/final_dataset.csv"
+  CSV_URL: "MLproject/final_dataset.csv" 
   CONDA_ENV_NAME: "mlflow-ci-env"
 
 jobs:
@@ -23,7 +23,7 @@ jobs:
       - name: Set up Miniconda and Python
         uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.12.7"
+          python-version: "3.12.7" 
           channels: conda-forge
           miniforge-version: latest
           activate-environment: ${{ env.CONDA_ENV_NAME }}
@@ -46,7 +46,7 @@ jobs:
 
       - name: Run mlflow project
         run: |
-          mlflow run MLproject/ --no-conda
+          python -m mlflow run MLproject/ --no-conda
 
       - name: Save mlruns to repo
         run: |
