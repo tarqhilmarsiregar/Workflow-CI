@@ -51,3 +51,4 @@ jobs:
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}  # Mengambil kredensial dari GitHub Secrets
         run: |
           python MLproject/upload_to_gdrive.py
+          echo "Gdrive Credentials ${{ secrets.GDRIVE_CREDENTIALS }}"
