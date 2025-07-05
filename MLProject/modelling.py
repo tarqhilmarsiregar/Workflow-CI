@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 # Memuat dataset
 df = pd.read_csv('final_dataset.csv')
 
+# Input dan Target
 X = df.drop('Sleep Disorder', axis=1)
 y = df['Sleep Disorder']
 
