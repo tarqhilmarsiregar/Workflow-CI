@@ -1,43 +1,45 @@
-name: MLflow CI/CD
+name: health-and-sleep-relation-CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+
+env:
+  CSV_URL: "MLproject/final_dataset.csv"
 
 jobs:
-  run-mlflow-project:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Set up job
-      run: echo "Start MLflow CI/CD Pipeline"
+      - name: Run actions/checkout@v3
+        uses: actions/checkout@v3
 
-    - name: Checkout repo
-      uses: actions/checkout@v3
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12.7"
+      
+      - name: Check Env
+        run: |
+          echo $CSV_URL
 
-    - name: Set up Miniconda
-      uses: conda-incubator/setup-miniconda@v2
-      with:
-        auto-update-conda: true
-        activate-environment: mlflow-env
-        environment-file: conda.yaml
-        python-version: 3.12.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mlflow
+      
+      - name: Run mlflow project
+        run: |
+          mlflow run MLproject --env-manager=local 
 
-    - name: Install MLflow (outside env)
-      run: pip install mlflow
-
-    - name: Run MLflow project with conda
-      run: |
-        mlflow run .  # Akan otomatis gunakan conda.yaml
-
-    - name: Get latest MLflow run_id
-      id: get-run-id
-      run: |
-        run_id=$(mlflow experiments list | awk 'NR==2{print $1}')
-        echo "Run ID: $run_id"
-        echo "run_id=$run_id" >> $GITHUB_ENV
-
-    - name: Print run_id
-      run: echo "Latest Run ID is ${{ env.run_id }}"
+      - name: Get latest MLflow run_id
+        id: get_run_id
+        run: |
+          RUN_ID=$(mlflow search-runs --max-results 1 --output json | jq -r '.[0].run_id')
+          echo "Latest run_id: $RUN_ID"
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
