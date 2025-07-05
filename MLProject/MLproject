@@ -1,7 +1,0 @@
-name: health-and-sleep-relation-ml-system
-
-conda_env: conda.yaml
-
-entry_points:
-  main:
-    command: "python modelling.py"
