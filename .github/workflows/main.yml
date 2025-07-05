@@ -1,57 +1,43 @@
-name: health-and-sleep-relation-CI
+name: MLflow CI/CD
 
 on:
-  push: 
-    branches:
-      - main
+  push:
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
-
-env:
-  CSV_URL: "MLproject/final_dataset.csv" 
-  CONDA_ENV_NAME: "mlflow-ci-env"
+    branches: [ main ]
 
 jobs:
-  build:
+  run-mlflow-project:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checks-out your repository under $GITHUB_WORKSPACE
-        uses: actions/checkout@v3
+    - name: Set up job
+      run: echo "Start MLflow CI/CD Pipeline"
 
-      - name: Set up Miniconda and Python
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          python-version: "3.12.7" 
-          channels: conda-forge
-          miniforge-version: latest
-          activate-environment: ${{ env.CONDA_ENV_NAME }}
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      - name: Create Conda environment
-        run: |
-          conda create -n ${{ env.CONDA_ENV_NAME }} python=3.12.7 -y
+    - name: Set up Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        activate-environment: mlflow-env
+        environment-file: conda.yaml
+        python-version: 3.12.7
 
-      - name: Check Env
-        run: |
-          echo "CSV_URL: ${{ env.CSV_URL }}"
-          echo "Current Python path: $(which python)" # Memastikan Python dari Conda yang benar digunakan
-          echo "Current PATH: $PATH" # Memeriksa PATH
-          conda env list # List conda environments untuk konfirmasi pembuatan dan aktivasi
+    - name: Install MLflow (outside env)
+      run: pip install mlflow
 
-      - name: Install dependencies
-        run: |
-          pip install mlflow
-          conda env update -n ${{ env.CONDA_ENV_NAME }} -f MLproject/conda.yaml
+    - name: Run MLflow project with conda
+      run: |
+        mlflow run .  # Akan otomatis gunakan conda.yaml
 
-      - name: Run mlflow project
-        run: |
-          python -m mlflow run MLproject/ --no-conda
+    - name: Get latest MLflow run_id
+      id: get-run-id
+      run: |
+        run_id=$(mlflow experiments list | awk 'NR==2{print $1}')
+        echo "Run ID: $run_id"
+        echo "run_id=$run_id" >> $GITHUB_ENV
 
-      - name: Save mlruns to repo
-        run: |
-          git config --global user.name ${{ secrets.username }}
-          git config --global user.email ${{ secrets.email }}
-          git add mlruns/
-          git commit -m "Save mlruns from CI run"
-          git push origin main
+    - name: Print run_id
+      run: echo "Latest Run ID is ${{ env.run_id }}"
