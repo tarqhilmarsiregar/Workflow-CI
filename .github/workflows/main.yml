@@ -43,9 +43,11 @@ jobs:
 
       - name: Get latest MLflow run_id
         run: |
-          RUN_ID=$(find mlruns/0 -type f -name 'meta.yaml' | sort | tail -n1 | cut -d'/' -f3)
+          RUN_ID=$(find mlruns/0/models -type f -name "meta.yaml" | sort | tail -n1 | cut -d'/' -f5)
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Latest MLflow run_id: $RUN_ID"
+          ls -l mlruns/0/models/$RUN_ID/artifacts
+          cat mlruns/0/models/$RUN_ID/artifacts/MLmodel
 
       - name: Install Python dependencies
         run: |
@@ -55,7 +57,7 @@ jobs:
         run: python MLproject/upload_to_gdrive.py
 
       - name: Build Docker Model
-        run: mlflow models build-docker -m mlruns/0/$RUN_ID/artifacts/model --name "health-and-sleep-relation"
+        run: mlflow models build-docker -m mlruns/0/models/$RUN_ID/artifacts --name "health-and-sleep-relation"
  
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
