@@ -43,7 +43,7 @@ jobs:
 
       - name: Get latest MLflow run_id
         run: |
-          RUN_ID=$(find mlruns/0/models -type f -name "meta.yaml" | sort | tail -n1 | cut -d'/' -f5)
+          RUN_ID=$(find mlruns/0/models -type f -name "meta.yaml" | sort | tail -n1 | xargs dirname | xargs basename)
           echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
           echo "Latest MLflow run_id: $RUN_ID"
           ls -l mlruns/0/models/$RUN_ID/artifacts
